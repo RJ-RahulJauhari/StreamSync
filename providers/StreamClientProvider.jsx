@@ -8,13 +8,15 @@ import {
     StreamVideoClient
   } from '@stream-io/video-react-sdk';
 import { useEffect, useState } from 'react';
+
+    const apiKey = process.env.NEXT_PUBLIC_STREAM_API_KEY;
   
-  const apiKey = process.env.NEXT_PUBLIC_STREAM_API_KEY;
-  
-  const StreamVideoProvider = ({children}) => {
+    const StreamVideoProvider = ({children}) => {
 
     const [videoClient,setVideoClient] = useState();
     const {user,isLoaded} = useUser();
+
+
     useEffect(() => {
         if(!isLoaded || !user){
             return
@@ -29,9 +31,10 @@ import { useEffect, useState } from 'react';
                 image:user?.imageUrl
             },
             tokenProvider: tokenProvider,
-            
         })
+
         setVideoClient(client);
+        
     },[user,isLoaded]);
 
     if(!videoClient) return <Loader></Loader>
