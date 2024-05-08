@@ -90,7 +90,7 @@ const CallList = ({type}) => {
                               ? () => router.push(`${(meeting).url}`)
                               : () => router.push(`/meeting/${(meeting).id}`)
                           }
-                        title={(meeting).state?.custom?.description.substring(0,26) ||
+                        title={(meeting).state?.custom?.description?.substring(0,26) ||
                             (meeting).filename?.substring(0, 20) ||
                             'No Description'}>
         
