@@ -1,14 +1,16 @@
 "use client"
 import { useGetCalls } from '@/hooks/useGetCalls'
 import { useRouter } from 'next/navigation';
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import MeetingCard from './MeetingCard';
+import { useToast } from './ui/use-toast';
 
 const CallList = ({type}) => {
 
     const {endedCalls, upcomingCalls, recordings, isLoading} = useGetCalls();
     const router = useRouter();
     const [callRecordings,setCallRecordings] = useState([]);
+    const toast = useToast();
 
     const getCalls = () => {
         switch(type){
@@ -35,6 +37,24 @@ const CallList = ({type}) => {
                 return "";
         }
     }
+
+    useEffect(() => {
+        const fetchRecordings = async () => {
+        try {
+            const callData = await Promise.all(callRecordings
+                .map((meeting) => meeting.queryRecordings()))
+
+            const recordings = callData
+                .filter(call => call.recordings.length > 0)
+                .flatMap(call => call.recordings)
+            
+            setCallRecordings(recordings);
+            if(type === 'recordings') fetchRecordings();
+        } catch (error) {
+            toast({title:"Try again later"})
+        }
+        
+    }},[type,callRecordings])
 
     const calls = getCalls();
     const noCallsMessage = getNoCallsMessage()
@@ -70,7 +90,7 @@ const CallList = ({type}) => {
                               ? () => router.push(`${(meeting).url}`)
                               : () => router.push(`/meeting/${(meeting).id}`)
                           }
-                        title={(meeting).state?.custom?.description ||
+                        title={(meeting).state?.custom?.description.substring(0,26) ||
                             (meeting).filename?.substring(0, 20) ||
                             'No Description'}>
         
