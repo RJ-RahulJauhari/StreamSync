@@ -15,6 +15,9 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en">
+      <head>
+        <link rel="shortcut icon" href="/icons/logo.png" />
+      </head>
       <ClerkProvider appearance={{
           variables:{
             colorText:"#fff",
