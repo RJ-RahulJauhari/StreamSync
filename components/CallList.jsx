@@ -3,14 +3,17 @@ import { useGetCalls } from '@/hooks/useGetCalls'
 import { useRouter } from 'next/navigation';
 import React, { useEffect, useState } from 'react'
 import MeetingCard from './MeetingCard';
-import { useToast } from './ui/use-toast';
+import { useToast } from "@/components/ui/use-toast"
 
 const CallList = ({type}) => {
 
-    const {endedCalls, upcomingCalls, recordings, isLoading} = useGetCalls();
+    // const {endedCalls, upcomingCalls, recording, isLoading} = useGetCalls();
     const router = useRouter();
-    const [callRecordings,setCallRecordings] = useState([]);
-    const toast = useToast();
+    // const [callRecordings,setCallRecordings] = useState([]);
+    const {toast} = useToast();
+    const { endedCalls, upcomingCalls, callRecordings, isLoading } =
+    useGetCalls();
+    const [recordings, setRecordings] = useState([]);
 
     const getCalls = () => {
         switch(type){
@@ -37,24 +40,25 @@ const CallList = ({type}) => {
                 return "";
         }
     }
-
+    
     useEffect(() => {
         const fetchRecordings = async () => {
-        try {
-            const callData = await Promise.all(callRecordings
-                .map((meeting) => meeting.queryRecordings()))
-
-            const recordings = callData
-                .filter(call => call.recordings.length > 0)
-                .flatMap(call => call.recordings)
-            
-            setCallRecordings(recordings);
-            if(type === 'recordings') fetchRecordings();
-        } catch (error) {
-            toast({title:"Try again later"})
+          const callData = await Promise.all(
+            callRecordings?.map((meeting) => meeting.queryRecordings()) ?? [],
+          );
+    
+          const recordings = callData
+            .filter((call) => call.recordings.length > 0)
+            .flatMap((call) => call.recordings);
+    
+          setRecordings(recordings);
+        };
+    
+        if (type === 'recordings') {
+          fetchRecordings();
         }
-        
-    }},[type,callRecordings])
+      }, [type, callRecordings]);
+
 
     const calls = getCalls();
     const noCallsMessage = getNoCallsMessage()
